@@ -1,0 +1,23 @@
+CREATE OR REPLACE FUNCTION public.getdistributionnodetypes_for_datamovement(userid integer, roleid integer, burid integer, olid integer, actid integer)
+ RETURNS TABLE(dntypeid integer, nodetypename character varying)
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+    INSERT INTO assignmentpreelogs(fntext, created)
+    SELECT 'getdistributionnodetypes_for_datamovement'
+           || '/' || $1::text || '/' || $2::text || '/' || $3::text || '/' || $4::text|| '/' || $5::text, now();
+
+    RETURN QUERY
+    /*
+    SELECT a.distributionnodetypeid,a.distributionnodetypename
+    FROM tbldistributionnodetypes a
+    INNER JOIN tblprojectuserallocation b ON a.projectid = b.projectid
+    INNER JOIN tblactivitynew c ON a.projectid = c.projectid
+    WHERE a.projectid = $3 AND b.userid = $1 AND b.roleid = $2 AND c.activityid = $5;*/
+    select distinct dist_node_type_rid,b.distributionnodetypename
+    from  se_dist_cat_role_map a 
+    inner join tbldistributionnodetypes b on a.dist_node_type_rid=b.distributionnodetypeid
+    where a.dcg_rid in ($5);
+
+END;
+$function$

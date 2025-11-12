@@ -1,0 +1,18 @@
+CREATE OR REPLACE FUNCTION getactivityid_for_datamovement(in userid int4, in roleid int4, in burid int4, in olid int4)
+  RETURNS TABLE (actid int4, actname varchar) AS 
+$BODY$
+BEGIN
+    INSERT INTO assignmentpreelogs(fntext, created)
+    SELECT 'getactivityid_for_datamovement'
+           || '/' || userid::text   || '/' || roleid::text || '/' || burid::text || '/' || olid::text, now();
+
+    RETURN QUERY
+    SELECT a.activityid, a.description
+    FROM tblactivitynew a
+    --INNER JOIN tblprojectuserallocation b  ON a.projectid = b.projectid
+	--WHERE a.projectid = $3 AND b.userid  = $1 AND b.roleid  = $2;
+    where a.activityid in (72,3);
+
+END;
+$BODY$
+  LANGUAGE 'plpgsql' COST 100.0 SECURITY INVOKER
